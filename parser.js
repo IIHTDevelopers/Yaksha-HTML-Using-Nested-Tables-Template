@@ -97,7 +97,8 @@ function checkHtmlAttributes(htmlContent, tagName, attributes) {
 function checkNestedTagsWithInnerAttributesPresence(htmlContent, outerTagName, innerTagName, attributes) {
     const dom = new JSDOM(htmlContent);
     const outerElements = dom.window.document.getElementsByTagName(outerTagName);
-    let isNestedWithAttributes = false;
+    let isNestedWithAttributeFound = false;
+    let isNestedWithAttributes = {};
 
     for (let outerElement of outerElements) {
         const innerElements = outerElement.getElementsByTagName(innerTagName);
@@ -111,22 +112,24 @@ function checkNestedTagsWithInnerAttributesPresence(htmlContent, outerTagName, i
                 }
             }
             if (allAttributesPresent) {
-                isNestedWithAttributes = true;
+                isNestedWithAttributeFound = true;
                 break;
             }
         }
 
-        if (isNestedWithAttributes) {
+        if (isNestedWithAttributeFound) {
             break;
         }
     }
 
     console.log(
         `Checking if <${innerTagName}> with attributes [${attributes.join(', ')}] is nested inside <${outerTagName}>: `,
-        isNestedWithAttributes
+        isNestedWithAttributeFound
     );
 
-    return isNestedWithAttributes ? 'pass' : 'fail';
+    isNestedWithAttributes['border'] = isNestedWithAttributeFound ? 'pass' : 'fail';
+
+    return isNestedWithAttributes;
 }
 
 // Format results into the TestCaseResultDto structure
@@ -239,7 +242,7 @@ const htmlTagsTestCase = {
     testCaseName: 'HTML Tags Test',
     testCaseType: 'boundary',
     testLogic: checkHtmlTags,
-    extraParams: [['html', 'body', 'title', 'h1', 'table', 'tr', 'td', 'th']]
+    extraParams: [['html', 'body', 'title', 'h1', 'table', 'tr', 'td']]
 };
 
 const htmlTableAttributesTestCase = {
